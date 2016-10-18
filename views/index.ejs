@@ -1,0 +1,28 @@
+<% include header.ejs %>
+
+<% if(!user){ %>
+<div class="jumbotron">
+    <div class="container">
+        <h1>TuCao</h1>
+        <p>TuCao 是一个发心情的系统</p>
+        <p>
+            <a class="btn btn-primary btn-large" href="/login">登录</a>
+            <a class="btn btn-info btn-large" href="/reg">立即注册</a>
+        </p>
+    </div>
+
+</div>
+<% } %>
+<% if(user) { %>
+<div class="jumbotron">
+    <form action="/post" method="post" style="text-align:center;" class="well form-inline center">
+        <input type="text" name="post" class="col-sm-8 col-sm-offset-1">
+        <button type="submit" style="float:left;margin-left:10px;" class="btn btn-success">
+            <i class="glyphicon glyphicon-comment">发言</i>
+        </button>
+        <div style="clear:both;"></div>
+    </form>
+</div>
+
+<% } %>
+<% include footer.ejs %>

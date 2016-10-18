@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><% if(locals.timetable) {%>
+        <%= locals.timetable.name %>
+        <%}%>---无课表提交页面</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css" >
+    <link rel="stylesheet" href="/stylesheets/timetable.css" >
+
+</head>
+<body>
+    <% if(!locals.timetable) {%>
+    <p> <%= locals.error %> </p>
+    <%} else {%>
+    <div class="jumbotron">
+        <div class="container">
+            <h2><%= locals.timetable.name %>---<small>无课表提交页面</small></h2>
+            <p> 联系人:&nbsp;<%= locals.timetable.contact %></p>
+            <p>
+                联系方式:&nbsp;<%= locals.timetable.phone  %>
+            </p>
+            <p>
+                tip:点击方格和你的课程表与之对应；错误的姓名与电话不能被提交
+            </p>
+        </div>
+
+    </div>
+    <form role="form">
+        <input type="text" id="token" hidden value="<%= locals.timetable.token  %>">
+
+        <div class="form-group col-md-6">
+            <input type="text" name="name" class="form-control" placeholder="请输入真实的姓名">
+        </div>
+        <div class="form-group col-md-6">
+            <input type="number" name="phone"  class="form-control"  placeholder="请输入真实的手机号码">
+        </div>
+    </form>
+    <table id="timetable"  class="table timetable" width="100%">
+        <caption >课程表</caption>
+    </table>
+
+    <input type="button" class="btn btn-block" value="重置" onclick="reset()">
+    <input type="button" class="btn btn-block" value="提交" onclick="submitTable()">
+
+
+<script type="text/javascript" src="/javascripts/jquery.js"></script>
+<script type="text/javascript">
+    var  ll = 12;
+    var  rr = 7;
+    var  arr = ['一','二','三', '四', '五','六', '七','八', '九', '十', '十一', '十二' ,'十三' ,'十四' ,'十五'];
+    $(function(){
+        createtable(<%= locals.timetable.rows %>,5);
+    });
+
+
+    function submitTable(){
+        var courses = new Array();
+        $('#timetable td').each(function(){
+                if($(this).html()=="√"){
+                    courses.push($(this).attr("id").replace("course",""));
+                }
+        });
+        var name = $(":input[name='name']").val();
+        var phone = $(":input[name='phone']").val();
+        var token = $("#token").val();
+        console.log(courses.toString());
+        $.ajax({
+            url:'addcourse',
+            type:'post',
+            dataType:'json',
+            data:{
+                name:name,
+                phone:phone,
+                courses:courses.toString(),
+                token:token
+            },
+            success:function(data){
+                if(data.code == 'success'){
+                    alert(data.message);
+                }
+            }
+        })
+    }
+
+    function createtable(l,r){
+        var head = "<tr><th></th>";
+        for(var  i = 0 ;i < r ; i++){
+            head += "<th> "+arr[i]+"</th>";
+        }
+        head += "</tr>";
+        $('#timetable').append(head);
+
+        for(var  i = 0 ; i < l ; i++){
+            var  row = "<tr><td>" + (i+1) + "</td>"
+            for(var j = 0 ;j < r ; j++)
+            {
+                var  x = i*r + j;
+                row += "<td id = 'course"+x+"'></td>";
+            }
+            row += "</tr>";
+            $('#timetable').append(row);
+        }
+
+        $('#timetable td').each(function(){
+            $(this).click(function(){
+                if($(this).index() == 0) return;
+                if($(this).html()=="√"){
+                    $(this).css("background-color","white");
+                    $(this).text("");
+                }else {
+                    $(this).css("background-color", "#ebcccc");
+                    $(this).text("√");
+                }
+            });
+
+        });
+    }
+
+    function reset(){
+        $('#timetable td').each(function(){
+            if($(this).index() == 0) return;
+
+            $(this).css("background-color","white");
+            $(this).text("");
+
+
+        });
+    }
+</script>
+<%}%>
+</body>
+</html>

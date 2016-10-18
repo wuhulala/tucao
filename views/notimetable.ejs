@@ -1,0 +1,191 @@
+<% include header.ejs %>
+<% if(locals.timetable) { %>
+
+<div class="container">
+    <table class="table table-bordered table-responsive">
+        <caption style="text-align: center">社团信息</caption>
+        <tr>
+            <td>社团</td>
+            <td><%= locals.timetable.name %></td>
+        </tr>
+        <tr>
+            <td>联系人</td>
+            <td><%= locals.timetable.contact %></td>
+        </tr>
+        <tr>
+            <td>联系方式</td>
+            <td><%= locals.timetable.phone %></td>
+        </tr>
+        <tr>
+            <td>链接</td>
+            <td><a target="_blank" data-toggle="tooltip"  title="点击预览无课表页面"
+                   href="<%= locals.timetable.url %>" class="btn btn-link"><%= locals.timetable.url %></a></td>
+        </tr>
+        <tr>
+            <td>成员</td>
+            <td>
+                <% var users = locals.timetable.users;
+                if(users){
+                users.forEach(function(v, k){ %>
+                <span class="label label-success" data-toggle="tooltip" title="电话号码:<%= v.phone %>"><%= v.name %></span>
+                <% });}else{ %>
+                还未添加人员
+                <% } %>
+                <button class="btn btn-link" data-toggle="modal" data-target="#userModal">
+                    <i class="glyphicon glyphicon-plus-sign"></i>添加成员
+                </button>
+
+            </td>
+        </tr>
+        <tr>
+            <td>提交成员</td>
+            <td>
+                <% var users = locals.timetable.timetables;
+                if(users){
+                users.forEach(function(v, k){ %>
+                <span class="label label-success" data-toggle="tooltip" title="电话号码:<%= v.phone %>"><%= v.name %></span>
+                <% });}else{ %>
+                暂时无人提交
+                <% } %>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-labelledby="userModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">添加成员</h4>
+            </div>
+            <div class="modal-body">
+                <a href="#" onclick="addRow()"><i class="glyphicon glyphicon-plus-sign"></i>添加一行</a>
+                <form id="userForm">
+                    <div class="form-group" id="userInfo">
+                        <div class="row user-form">
+                            <div class="col-sm-5">
+                                <input type="text" name="name" class="form-control" placeholder="请输入姓名" >
+                            </div>
+                            <div class="col-sm-5">
+                                <input type="text" name="phone" class="form-control" placeholder="请输入电话号码">
+                            </div>
+                            <div class="col-sm-2">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveUsers()">保存添加</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+<% } else { %>
+<form class="form-horizontal" method="post" action="/generatorurl">
+    <fieldset>
+        <legend>社团无课表链接生成</legend>
+        <div class="form-group">
+            <label for="username" class="col-sm-2 control-label">社团名</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" id="clubname" name="clubname" placeholder="用户名">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="contact" class="col-sm-2 control-label">联系人名称</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" id="contact" name="contact" placeholder="联系人名称">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="phone" class="col-md-2 control-label">联系方式</label>
+            <div class="col-md-4">
+                <input type="number" class="form-control" id="phone" name="phone" placeholder="联系方式">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="phone" class="col-md-2 control-label">节数</label>
+            <div class="col-md-4">
+                <input type="number" class="form-control" id="rows" value="12" name="rows" placeholder="节数 默认为12">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary">生成链接</button>
+            </div>
+        </div>
+    </fieldset>
+</form>
+
+
+<% } %>
+
+<% include footer.ejs %>
+
+<script type="text/javascript">
+
+    $(function () {
+        $('#userModal').on('show.bs.modal', function (e) {
+            var html = '<div class="row user-form">'+
+                    '<div class="col-sm-5">'+
+                    '<input type="text" name="name" class="form-control" placeholder="请输入姓名" >'+
+                    '</div>'+
+                    '<div class="col-sm-5">'+
+                    '<input type="text" name="phone" class="form-control" placeholder="请输入电话号码">'+
+                    '</div>'+
+                    '<div class="col-sm-2">'+
+                    '</div>'+
+                    '</div>' ;
+            $("#userInfo").html(html);
+        });
+    });
+
+
+
+    function addRow() {
+
+
+        var html = '<div class="row user-form">'+
+                '<div class="col-sm-5">'+
+                '<input type="text" name="name" class="form-control" placeholder="请输入姓名" >'+
+                '</div>'+
+                '<div class="col-sm-5">'+
+                '<input type="text" name="phone" class="form-control" placeholder="请输入电话号码">'+
+                '</div>'+
+                '<div class="col-sm-2">'+
+                '<a href="#" onclick="removeCurRow(this)"><i class="glyphicon glyphicon-minus-sign"></i></a>'+
+                '</div>'+
+                '</div>' ;
+        $("#userInfo").append(html);
+    }
+
+    function removeCurRow(obj) {
+        $(obj).parent().parent().remove();
+    }
+
+    function saveUsers() {
+        var users = [];
+        $("#userInfo").find(".user-form").each(function(){
+            var user = {
+                name:$(this).find(":input[name='name']").val(),
+                phone:$(this).find(":input[name='phone']").val()
+            };
+            users.push(user);
+        });
+
+
+        $.post("/notimetable/user",{
+            users:users.toString()
+        },function (data) {
+            if(data.code == 'success'){
+                console.log(data.message);
+            }
+        })
+    }
+</script>
